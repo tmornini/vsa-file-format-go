@@ -60,7 +60,16 @@ func (h header) String() string {
 		h.other.String() + "\n"
 }
 
-type event struct{}
+type event struct {
+	kind          string
+	track         int16
+	startTime     int32
+	endTime       int32
+	startPosition int32
+	endPosition   int32
+	text          string
+	data          []byte
+}
 
 func (e event) String() string {
 	return "event: ?\n"
