@@ -6,6 +6,18 @@ import (
 	"fmt"
 )
 
+// File VSA file
+type File struct {
+	header header
+	events events
+}
+
+func (f File) String() string {
+	return f.header.String() + f.events.String()
+}
+
+// private
+
 type unknownOne []byte
 
 func (v unknownOne) String() string {
@@ -84,14 +96,4 @@ func (es events) String() string {
 		s += e.String()
 	}
 	return s
-}
-
-// File VSA file
-type File struct {
-	header header
-	events events
-}
-
-func (f File) String() string {
-	return f.header.String() + f.events.String()
 }
