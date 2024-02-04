@@ -20,37 +20,39 @@ func (f File) String() string {
 
 // private
 
-type unknownOne []byte
-type level string
-type options []byte
-type email string
-type eventCount int
-type unknownTwo []byte
-type firstEventType string
-
 type header struct {
-	unknownOne     unknownOne
-	level          level
-	options        options
-	email          email
-	eventCount     eventCount
-	unknownTwo     unknownTwo
-	firstEventType firstEventType
+	unknownOne     []byte
+	level          string
+	options        []byte
+	email          string
+	eventCount     int
+	unknownTwo     []byte
+	firstEventType string
 }
 
 func (h header) String() string {
 	return "HEADER\n" +
-		"      unknownOne: " + hex.EncodeToString([]byte(h.unknownOne)) + "\n" +
-		"           level: " + string(h.level) + "\n" +
-		"         options: " + hex.EncodeToString([]byte(h.options)) + " (non-ASCII string, hex encoded for display)\n" +
-		"           email: " + string(h.email) + "\n" +
+		"      unknownOne: " + hex.EncodeToString(h.unknownOne) + "\n" +
+		"           level: " + fmt.Sprint(h.level) + "\n" +
+		"         options: " + hex.EncodeToString(h.options) + " (non-ASCII string, hex encoded for display)\n" +
+		"           email: " + fmt.Sprint(h.email) + "\n" +
 		"     event count: " + fmt.Sprintf("%d", h.eventCount) + "\n" +
-		"      unknownTwo: " + hex.EncodeToString([]byte(h.unknownTwo)) + "\n" +
-		"  firstEventType: " + string(h.firstEventType) + "\n"
+		"      unknownTwo: " + hex.EncodeToString(h.unknownTwo) + "\n" +
+		"  firstEventType: " + fmt.Sprint(h.firstEventType) + "\n"
 }
 
+type eventNumber int
+type _type string
+type track int
+type startTime int
+type endTime int
+type startPosition int
+type endPosition int
+type data []byte
+type continuation string
+
 type event struct {
-	number        int
+	eventNumber   int
 	_type         string
 	track         int
 	startTime     int
@@ -62,15 +64,15 @@ type event struct {
 }
 
 func (e event) String() string {
-	return fmt.Sprintf("  event: %d\n", e.number) +
-		"            _type: " + e._type + "\n" +
+	return "      eventNumber: " + fmt.Sprint("%d\n", e.eventNumber) +
+		"            _type: " + fmt.Sprint(e._type) + "\n" +
 		"            track: " + fmt.Sprint(e.track) + "\n" +
 		"       start time: " + fmt.Sprint(e.startTime) + "\n" +
 		"         end time: " + fmt.Sprint(e.endTime) + "\n" +
 		"    startPosition: " + fmt.Sprint(e.startPosition) + "\n" +
 		"      endPosition: " + fmt.Sprint(e.endPosition) + "\n" +
 		"             data: " + hex.EncodeToString(e.data) + "\n" +
-		"     continuation: " + e.continuation + "\n"
+		"     continuation: " + fmt.Sprint(e.continuation) + "\n"
 }
 
 type events []event
