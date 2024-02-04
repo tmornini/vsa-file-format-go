@@ -145,16 +145,23 @@ func headerFrom(reader io.Reader) (*header, error) {
 	return &h, nil
 }
 
+// HEADER
+//     unknownOne(12)
+//     SIZE(1) LEVEL(S)
+//     SIZE(1) OPTIONS(S)
+//     SIZE(1) EMAIL(S)
+//     EVENTCOUNG(4)
+//     unknownTwo(4)
+
 // EVENTS
 //     SIZE(2) DEFAULTEVENTTYPE(S)
-//     SIZE(2) COUNT(S)
 //         EVENT
 //             TRACK(2)
 //             STARTTIME(4)
 //             ENDTIME(4)
 //             STARPOSITION(4)
 //             ENDPOSITION(4)
-//             SIZE(1) TEXT(S)            <--\
+//             SIZE(1) KIND(S)            <--\
 //                 "CEventBarLinear"         |
 //                     DATA(12)              | <-\
 //                 "CEventBarPulse"          |   | or
@@ -167,37 +174,34 @@ func headerFrom(reader io.Reader) (*header, error) {
 
 // AUDIO FILES
 //     COUNT(4)
-//         Audio Files
-//             SIZE(1) FILE(S)
-//             SIZE(1) AUDIO_DEVICE(S)
+//         SIZE(1) FILE(S)
+//         SIZE(1) AUDIO_DEVICE(S)
 
 // VIDEO FILES
 //     COUNT(4)
-//         Video Files
-//             SIZE(1) FILE(S)
-//             SIZE(1) AUDIO(S)
-//             SIZE(1) MONITOR(S)
-//             FULLSCREEN(1)
-//             XOFFSET(4)
-//             YOFFSET(4)
+//         SIZE(1) FILE(S)
+//         SIZE(1) AUDIO(S)
+//         SIZE(1) MONITOR(S)
+//         FULLSCREEN(1)
+//         XOFFSET(4)
+//         YOFFSET(4)
 
 // unknown3(12)
 
 // TRACK SETTINGS
 //     COUNT(4)
-//         Tracks
-//             SIZE(1) TEXT(S)
-//             ADDR(4)
-//             CNTR(1)
-//             unknown4(11)
-//             +VAL(4)
-//             -VAL(4)
-//             NEUT(4)
-//             ENBL(1)
-//             unknown5(1)
-//             unknown6(2)
-//             SIZE(1) PORT(S)
-//             unknown7(12)
+//         SIZE(1) TEXT(S)
+//         ADDR(4)
+//         CNTR(1)
+//         unknown4(11)
+//         +VAL(4)
+//         -VAL(4)
+//         NEUT(4)
+//         ENBL(1)
+//         unknown5(1)
+//         unknown6(2)
+//         SIZE(1) PORT(S)
+//         unknown7(12)
 
 func eventFrom(reader io.Reader) (*event, error) {
 
