@@ -13,52 +13,20 @@ type File struct {
 }
 
 func (f File) String() string {
-	return f.header.String() + f.events.String()
+	return f.header.String() +
+		"\n" +
+		f.events.String()
 }
 
 // private
 
 type unknownOne []byte
-
-func (v unknownOne) String() string {
-	return "  unknownOne:  " + hex.EncodeToString([]byte(v)) + "\n"
-}
-
 type level string
-
-func (l level) String() string {
-	return "  level:       " + string(l) + "\n"
-}
-
 type options []byte
-
-func (o options) String() string {
-	return "  options:     " + hex.EncodeToString([]byte(o)) + "\n"
-}
-
 type email string
-
-func (e email) String() string {
-	return "  email:       " + string(e) + "\n"
-}
-
 type eventCount int
-
-func (ec eventCount) String() string {
-	return fmt.Sprintf("  event count: %d\n", ec)
-}
-
 type unknownTwo []byte
-
-func (o unknownTwo) String() string {
-	return "  unknownTwo:  " + hex.EncodeToString([]byte(o)) + "\n"
-}
-
 type firstEventType string
-
-func (f firstEventType) String() string {
-	return "  firstEventType:  " + string(f) + "\n"
-}
 
 type header struct {
 	unknownOne     unknownOne
@@ -72,13 +40,13 @@ type header struct {
 
 func (h header) String() string {
 	return "HEADER\n" +
-		h.unknownOne.String() +
-		h.level.String() +
-		h.options.String() +
-		h.email.String() +
-		h.eventCount.String() +
-		h.unknownTwo.String() +
-		h.firstEventType.String()
+		"      unknownOne: " + hex.EncodeToString([]byte(h.unknownOne)) + "\n" +
+		"           level: " + string(h.level) + "\n" +
+		"         options: " + hex.EncodeToString([]byte(h.options)) + " (non-ASCII string, hex encoded for display)\n" +
+		"           email: " + string(h.email) + "\n" +
+		"     event count: " + fmt.Sprintf("%d", h.eventCount) + "\n" +
+		"      unknownTwo: " + hex.EncodeToString([]byte(h.unknownTwo)) + "\n" +
+		"  firstEventType: " + string(h.firstEventType) + "\n"
 }
 
 type event struct {
