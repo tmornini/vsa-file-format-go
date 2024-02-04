@@ -42,7 +42,7 @@ func (e email) String() string {
 	return "  email:       " + string(e) + "\n"
 }
 
-type eventCount uint32
+type eventCount int
 
 func (ec eventCount) String() string {
 	return fmt.Sprintf("  event count: %d\n", ec)
@@ -74,18 +74,25 @@ func (h header) String() string {
 }
 
 type event struct {
-	kind          string
-	track         int16
-	startTime     int32
-	endTime       int32
-	startPosition int32
-	endPosition   int32
-	text          string
+	number        int
+	_type         string
+	track         int
+	startTime     int
+	endTime       int
+	startPosition int
+	endPosition   int
 	data          []byte
 }
 
 func (e event) String() string {
-	return "event: ?\n"
+	return fmt.Sprintf("  event: %d\n", e.number) +
+		"            _type: " + e._type + "\n" +
+		"            track: " + fmt.Sprint(e.track) + "\n" +
+		"       start time: " + fmt.Sprint(e.startTime) + "\n" +
+		"         end time: " + fmt.Sprint(e.endTime) + "\n" +
+		"    startPosition: " + fmt.Sprint(e.startPosition) + "\n" +
+		"      endPosition: " + fmt.Sprint(e.endPosition) + "\n" +
+		"             data: " + hex.EncodeToString(e.data) + "\n"
 }
 
 type events []event
