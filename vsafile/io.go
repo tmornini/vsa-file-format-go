@@ -21,29 +21,22 @@ func bytesFrom(reader io.Reader, length int) (*[]byte, error) {
 }
 
 func stringFrom(reader io.Reader) (*string, error) {
-	lengthByte := make([]byte, 1)
+	lengthBytes, err := bytesFrom(reader, 1)
 
-	n, err := io.ReadFull(reader, lengthByte)
 	if err != nil {
 		return nil, err
 	}
-	if n != 1 {
-		return nil, fmt.Errorf("expected to read 1 byte, actually read %d", n)
-	}
 
-	stringLength := int(lengthByte[0])
+	bytes := *lengthBytes
 
-	stringBytes := make([]byte, stringLength)
+	stringLength := int(bytes[0])
 
-	n, err = io.ReadFull(reader, stringBytes)
+	stringBytes, err := bytesFrom(reader, stringLength)
 	if err != nil {
 		return nil, err
 	}
-	if n != stringLength {
-		return nil, fmt.Errorf("expected to read %d byte, actually read %d", stringLength, n)
-	}
 
-	s := string(stringBytes)
+	s := string(*stringBytes)
 
 	return &s, nil
 }
