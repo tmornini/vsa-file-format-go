@@ -267,6 +267,7 @@ func eventsFrom(reader io.Reader, h header) ([]event, error) {
 			fmt.Println("continuation: 0000 last event")
 		case "0180":
 			fmt.Println("continuation: 0180 next event is default type")
+
 			currentEventType = h.defaultEventType
 		case "ffff":
 			fmt.Println("continuation: ffff: next event is new type!")
@@ -275,6 +276,8 @@ func eventsFrom(reader io.Reader, h header) ([]event, error) {
 			if err != nil {
 				return nil, err
 			}
+		default:
+			fmt.Println("continuation:", e.continuation, "unknown")
 		}
 	}
 
