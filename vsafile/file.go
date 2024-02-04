@@ -9,37 +9,37 @@ import (
 type unknownOne []byte
 
 func (v unknownOne) String() string {
-	return "unknownOne:     " + hex.EncodeToString([]byte(v)) + "\n"
+	return "  unknownOne:  " + hex.EncodeToString([]byte(v)) + "\n"
 }
 
 type level string
 
 func (l level) String() string {
-	return "level:       " + string(l) + "\n"
+	return "  level:       " + string(l) + "\n"
 }
 
 type options []byte
 
 func (o options) String() string {
-	return "options:     " + hex.EncodeToString([]byte(o)) + "\n"
+	return "  options:     " + hex.EncodeToString([]byte(o)) + "\n"
 }
 
 type email string
 
 func (e email) String() string {
-	return "email:       " + string(e) + "\n"
+	return "  email:       " + string(e) + "\n"
 }
 
 type eventCount uint32
 
 func (ec eventCount) String() string {
-	return fmt.Sprintf("event count: %d\n", ec)
+	return fmt.Sprintf("  event count: %d\n", ec)
 }
 
 type unknownTwo []byte
 
 func (o unknownTwo) String() string {
-	return "unknownTwo:       " + hex.EncodeToString([]byte(o)) + "\n"
+	return "  unknownTwo:  " + hex.EncodeToString([]byte(o)) + "\n"
 }
 
 type header struct {
@@ -52,7 +52,8 @@ type header struct {
 }
 
 func (h header) String() string {
-	return h.unknownOne.String() +
+	return "HEADER\n" +
+		h.unknownOne.String() +
 		h.level.String() +
 		h.options.String() +
 		h.email.String() +
@@ -78,7 +79,7 @@ func (e event) String() string {
 type events []event
 
 func (es events) String() string {
-	s := "events:\n"
+	s := "EVENTS:\n"
 	for _, e := range es {
 		s += e.String()
 	}
