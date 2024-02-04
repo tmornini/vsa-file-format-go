@@ -20,18 +20,41 @@ func bytesFrom(reader io.Reader, length int) (*[]byte, error) {
 	return &bytes, nil
 }
 
-func stringFrom(reader io.Reader) (*string, error) {
-	lengthBytes, err := bytesFrom(reader, 1)
+func integerFrom(reader io.Reader, length int) (*int, error) {
+	switch length {
+	case 1, 2, 4, 8:
+	default:
+		return nil, fmt.Errorf("length must be 1, 2, 4 or 8, was %d", length)
+	}
 
+	bytesRead, err := bytesFrom(reader, length)
 	if err != nil {
 		return nil, err
 	}
 
-	bytes := *lengthBytes
+	i := 0
 
-	stringLength := int(bytes[0])
+	switch length {
+	case 1:
+		i = int((*bytesRead)[0])
+	case 2:
+		i = int(binary.LittleEndian.Uint16(*bytesRead))
+	case 4:
+		i = int(binary.LittleEndian.Uint32(*bytesRead))
+	case 5:
+		i = int(binary.LittleEndian.Uint64(*bytesRead))
+	}
 
-	stringBytes, err := bytesFrom(reader, stringLength)
+	return &i, nil
+}
+
+func stringFrom(reader io.Reader) (*string, error) {
+	length, err := integerFrom(reader, 1)
+	if err != nil {
+		return nil, err
+	}
+
+	stringBytes, err := bytesFrom(reader, *length)
 	if err != nil {
 		return nil, err
 	}
@@ -81,14 +104,12 @@ func emailFrom(reader io.Reader) (*email, error) {
 }
 
 func eventCountFrom(reader io.Reader) (*eventCount, error) {
-	ecBytes, err := bytesFrom(reader, 4)
+	c, err := integerFrom(reader, 4)
 	if err != nil {
 		return nil, err
 	}
 
-	c := binary.LittleEndian.Uint32(*ecBytes)
-
-	ec := eventCount(c)
+	ec := eventCount(*c)
 
 	return &ec, nil
 }
