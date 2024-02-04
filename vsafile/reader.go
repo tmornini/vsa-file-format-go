@@ -48,8 +48,8 @@ func integerFrom(reader io.Reader, length int) (*int, error) {
 	return &i, nil
 }
 
-func stringFrom(reader io.Reader) (*string, error) {
-	length, err := integerFrom(reader, 1)
+func stringFrom(reader io.Reader, lengthCount int) (*string, error) {
+	length, err := integerFrom(reader, lengthCount)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func unknownOneFrom(reader io.Reader) (*unknownOne, error) {
 }
 
 func levelFrom(reader io.Reader) (*level, error) {
-	l, err := stringFrom(reader)
+	l, err := stringFrom(reader, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func levelFrom(reader io.Reader) (*level, error) {
 }
 
 func optionsFrom(reader io.Reader) (*options, error) {
-	o, err := stringFrom(reader)
+	o, err := stringFrom(reader, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func optionsFrom(reader io.Reader) (*options, error) {
 }
 
 func emailFrom(reader io.Reader) (*email, error) {
-	es, err := stringFrom(reader)
+	es, err := stringFrom(reader, 1)
 
 	if err != nil {
 		return nil, err
