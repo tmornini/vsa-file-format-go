@@ -6,10 +6,10 @@ import (
 	"fmt"
 )
 
-type version []byte
+type unknownOne []byte
 
-func (v version) String() string {
-	return "version:     " + hex.EncodeToString([]byte(v)) + "\n"
+func (v unknownOne) String() string {
+	return "unknownOne:     " + hex.EncodeToString([]byte(v)) + "\n"
 }
 
 type level string
@@ -36,28 +36,28 @@ func (ec eventCount) String() string {
 	return fmt.Sprintf("event count: %d\n", ec)
 }
 
-type other []byte
+type unknownTwo []byte
 
-func (o other) String() string {
-	return "other:       " + hex.EncodeToString([]byte(o)) + "\n"
+func (o unknownTwo) String() string {
+	return "unknownTwo:       " + hex.EncodeToString([]byte(o)) + "\n"
 }
 
 type header struct {
-	version    version
+	unknownOne unknownOne
 	level      level
 	options    options
 	email      email
 	eventCount eventCount
-	other      other
+	unknownTwo unknownTwo
 }
 
 func (h header) String() string {
-	return h.version.String() +
+	return h.unknownOne.String() +
 		h.level.String() +
 		h.options.String() +
 		h.email.String() +
 		h.eventCount.String() +
-		h.other.String() + "\n"
+		h.unknownTwo.String() + "\n"
 }
 
 type event struct {

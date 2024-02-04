@@ -48,13 +48,13 @@ func stringFrom(reader io.Reader) (*string, error) {
 	return &s, nil
 }
 
-func versionFrom(reader io.Reader) (*version, error) {
+func unknownOneFrom(reader io.Reader) (*unknownOne, error) {
 	bytesRead, err := bytesFrom(reader, 12)
 	if err != nil {
 		return nil, err
 	}
 
-	return (*version)(bytesRead), nil
+	return (*unknownOne)(bytesRead), nil
 }
 
 func levelFrom(reader io.Reader) (*level, error) {
@@ -100,24 +100,24 @@ func eventCountFrom(reader io.Reader) (*eventCount, error) {
 	return &ec, nil
 }
 
-func otherFrom(reader io.Reader) (*other, error) {
+func unknownTwoFrom(reader io.Reader) (*unknownTwo, error) {
 	bytesRead, err := bytesFrom(reader, 4)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return (*other)(bytesRead), nil
+	return (*unknownTwo)(bytesRead), nil
 }
 
 func headerFrom(reader io.Reader) (*header, error) {
 	h := header{}
 
-	v, err := versionFrom(reader)
+	v, err := unknownOneFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	h.version = *v
+	h.unknownOne = *v
 
 	l, err := levelFrom(reader)
 	if err != nil {
@@ -143,11 +143,11 @@ func headerFrom(reader io.Reader) (*header, error) {
 	}
 	h.eventCount = *ec
 
-	ot, err := otherFrom(reader)
+	ot, err := unknownTwoFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	h.other = *ot
+	h.unknownTwo = *ot
 
 	return &h, nil
 }
