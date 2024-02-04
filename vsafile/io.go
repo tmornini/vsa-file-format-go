@@ -64,8 +64,25 @@ func stringFrom(reader io.Reader) (*string, error) {
 	return &s, nil
 }
 
+func validateSignature(readSignature *[]byte) error {
+	knownSignature := []byte{0x0a, 0xd7, 0xa3, 0x70, 0x3d, 0x0a, 0x18, 0x40, 0x01, 0x00, 0x00, 0x00}
+
+	for i := 0; i < 12; i++ {
+		if (*readSignature)[i] != knownSignature[i] {
+			return fmt.Errorf("invalid file signature")
+		}
+	}
+
+	return nil
+}
+
 func unknownOneFrom(reader io.Reader) (*unknownOne, error) {
 	bytesRead, err := bytesFrom(reader, 12)
+	if err != nil {
+		return nil, err
+	}
+
+	err = validateSignature(bytesRead)
 	if err != nil {
 		return nil, err
 	}
