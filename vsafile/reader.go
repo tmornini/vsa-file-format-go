@@ -180,6 +180,12 @@ func headerFrom(reader io.Reader) (*header, error) {
 	}
 	h.unknownTwo = *ot
 
+	fe, err := stringFrom(reader, 2)
+	if err != nil {
+		return nil, err
+	}
+	h.firstEventType = firstEventType(*fe)
+
 	return &h, nil
 }
 

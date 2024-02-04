@@ -54,13 +54,20 @@ func (o unknownTwo) String() string {
 	return "  unknownTwo:  " + hex.EncodeToString([]byte(o)) + "\n"
 }
 
+type firstEventType string
+
+func (f firstEventType) String() string {
+	return "  firstEventType:  " + string(f) + "\n"
+}
+
 type header struct {
-	unknownOne unknownOne
-	level      level
-	options    options
-	email      email
-	eventCount eventCount
-	unknownTwo unknownTwo
+	unknownOne     unknownOne
+	level          level
+	options        options
+	email          email
+	eventCount     eventCount
+	unknownTwo     unknownTwo
+	firstEventType firstEventType
 }
 
 func (h header) String() string {
@@ -70,7 +77,8 @@ func (h header) String() string {
 		h.options.String() +
 		h.email.String() +
 		h.eventCount.String() +
-		h.unknownTwo.String() + "\n"
+		h.unknownTwo.String() +
+		h.firstEventType.String()
 }
 
 type event struct {
