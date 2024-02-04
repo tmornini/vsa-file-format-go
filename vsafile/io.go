@@ -145,21 +145,21 @@ func headerFrom(reader io.Reader) (*header, error) {
 	return &h, nil
 }
 
-func eventFrom(reader io.Reader) (*event, error) {}
+// func eventFrom(reader io.Reader) (*event, error) {}
 
-func eventsFrom(reader io.Reader, h header) ([]event, error) {
-	events := make([]event, h.eventCount)
+// func eventsFrom(reader io.Reader, h header) ([]event, error) {
+// 	events := make([]event, h.eventCount)
 
-	for i := 0; i < int(h.eventCount); i++ {
-		e, err := eventFrom(reader)
-		if err != nil {
-			return nil, err
-		}
-		events[i] = *e
-	}
+// 	for i := 0; i < int(h.eventCount); i++ {
+// 		e, err := eventFrom(reader)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		events[i] = *e
+// 	}
 
-	return events, nil
-}
+// 	return events, nil
+// }
 
 // NewFileFrom creates a new File from a ByteReader
 func NewFileFrom(reader io.Reader) (*File, error) {
@@ -171,11 +171,11 @@ func NewFileFrom(reader io.Reader) (*File, error) {
 	}
 	f.header = *h
 
-	es, err := eventsFrom(reader, f.header)
-	if err != nil {
-		return nil, err
-	}
-	f.events = es
+	// es, err := eventsFrom(reader, f.header)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// f.events = es
 
 	return &f, nil
 }
