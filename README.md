@@ -25,6 +25,7 @@ EVENTS
             ENDTIME(4)
             STARPOSITION(4)
             ENDPOSITION(4)
+            unknownThree(1)
             SIZE(1) KIND(S)            <--\
                 "CEventBarLinear"         |
                     DATA(12)              | <-\
@@ -50,22 +51,22 @@ VIDEO FILES
         XOFFSET(4)
         YOFFSET(4)
 
-unknown3(12)
+unknownFour(12)
 
 TRACK SETTINGS
     COUNT(4)
         SIZE(1) TEXT(S)
         ADDR(4)
         CNTR(1)
-        unknown4(11)
+        unknownFive(11)
         +VAL(4)
         -VAL(4)
         NEUT(4)
         ENBL(1)
-        unknown5(1)
-        unknown6(2)
+        unknownSix(1)
+        unknownSeven(2)
         SIZE(1) PORT(S)
-        unknown7(12)
+        unknownEight(12)
 ```
 
 ## Unknown Fields

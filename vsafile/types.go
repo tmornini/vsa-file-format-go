@@ -49,6 +49,7 @@ type event struct {
 	endTime       int
 	startPosition int
 	endPosition   int
+	unknownThree  []byte
 	data          []byte
 	continuation  string
 }
@@ -61,6 +62,7 @@ func (e event) String() string {
 		"         end time: " + fmt.Sprint(e.endTime) + "\n" +
 		"    startPosition: " + fmt.Sprint(e.startPosition) + "\n" +
 		"      endPosition: " + fmt.Sprint(e.endPosition) + "\n" +
+		"     unknownThree: " + hex.EncodeToString(e.unknownThree) + "\n" +
 		"             data: " + hex.EncodeToString(e.data) + "\n" +
 		"     continuation: " + fmt.Sprint(e.continuation) + "\n"
 }

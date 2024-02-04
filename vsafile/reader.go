@@ -228,6 +228,12 @@ func newEventFrom(reader io.Reader, eventNumber int, kind string) (*event, error
 	}
 	e.endPosition = endPosition
 
+	unknownThree, err := bytesFrom(reader, 1)
+	if err != nil {
+		return nil, err
+	}
+	e.unknownThree = unknownThree
+
 	data := []byte{}
 
 	switch kind {
