@@ -137,6 +137,14 @@ func unknownTwoFrom(reader io.Reader) ([]byte, error) {
 	return bytesRead, nil
 }
 
+func eventTypeFrom(reader io.Reader) (string, error) {
+	et, err := stringFrom(reader, 2)
+	if err != nil {
+		return "", err
+	}
+	return et, nil
+}
+
 func headerFrom(reader io.Reader) (*header, error) {
 	h := &header{}
 
@@ -176,17 +184,19 @@ func headerFrom(reader io.Reader) (*header, error) {
 	}
 	h.unknownTwo = ot
 
-	fe, err := stringFrom(reader, 2)
+	h.defaultEventType, err = eventTypeFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	h.firstEventType = fe
 
 	return h, nil
 }
 
 func newEventFrom(reader io.Reader, eventNumber int, kind string) (*event, error) {
-	e := event{eventNumber: eventNumber}
+	e := event{
+		eventNumber: eventNumber,
+		_type:       kind,
+	}
 
 	track, err := integerFrom(reader, 2)
 	if err != nil {
@@ -240,19 +250,36 @@ func newEventFrom(reader io.Reader, eventNumber int, kind string) (*event, error
 	return &e, nil
 }
 
-// func eventsFrom(reader io.Reader, h header) ([]event, error) {
-// 	events := make([]event, h.eventCount)
+func eventsFrom(reader io.Reader, h header) ([]event, error) {
+	events := make([]event, h.eventCount)
 
-// 	for i := 0; i < int(h.eventCount); i++ {
-// 		e, err := newEventFrom(reader)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		events[i] = *e
-// 	}
+	currentEventType := h.defaultEventType
 
-// 	return events, nil
-// }
+	for i := 0; i < int(h.eventCount); i++ {
+		e, err := newEventFrom(reader, i, currentEventType)
+		if err != nil {
+			return nil, err
+		}
+		events[i] = *e
+
+		switch e.continuation {
+		case "0000":
+			fmt.Println("continuation: 0000 last event")
+		case "0180":
+			fmt.Println("continuation: 0180 next event is default type")
+			currentEventType = h.defaultEventType
+		case "ffff":
+			fmt.Println("continuation: ffff: next event is new type!")
+
+			currentEventType, err = eventTypeFrom(reader)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return events, nil
+}
 
 // NewFileFrom creates a new File from a ByteReader
 func NewFileFrom(reader io.Reader) (*File, error) {
@@ -264,11 +291,11 @@ func NewFileFrom(reader io.Reader) (*File, error) {
 	}
 	f.header = *h
 
-	// es, err := eventsFrom(reader, f.header)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// f.events = es
+	es, err := eventsFrom(reader, f.header)
+	if err != nil {
+		return nil, err
+	}
+	f.events = es
 
 	return &f, nil
 }

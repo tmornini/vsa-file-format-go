@@ -21,35 +21,25 @@ func (f File) String() string {
 // private
 
 type header struct {
-	unknownOne     []byte
-	level          string
-	options        []byte
-	email          string
-	eventCount     int
-	unknownTwo     []byte
-	firstEventType string
+	unknownOne       []byte
+	level            string
+	options          []byte
+	email            string
+	eventCount       int
+	unknownTwo       []byte
+	defaultEventType string
 }
 
 func (h header) String() string {
 	return "HEADER\n" +
-		"      unknownOne: " + hex.EncodeToString(h.unknownOne) + "\n" +
-		"           level: " + fmt.Sprint(h.level) + "\n" +
-		"         options: " + hex.EncodeToString(h.options) + " (non-ASCII string, hex encoded for display)\n" +
-		"           email: " + fmt.Sprint(h.email) + "\n" +
-		"     event count: " + fmt.Sprintf("%d", h.eventCount) + "\n" +
-		"      unknownTwo: " + hex.EncodeToString(h.unknownTwo) + "\n" +
-		"  firstEventType: " + fmt.Sprint(h.firstEventType) + "\n"
+		"        unknownOne: " + hex.EncodeToString(h.unknownOne) + "\n" +
+		"             level: " + fmt.Sprint(h.level) + "\n" +
+		"           options: " + hex.EncodeToString(h.options) + " (non-ASCII string, hex encoded for display)\n" +
+		"             email: " + fmt.Sprint(h.email) + "\n" +
+		"       event count: " + fmt.Sprintf("%d", h.eventCount) + "\n" +
+		"        unknownTwo: " + hex.EncodeToString(h.unknownTwo) + "\n" +
+		"  defaultEventType: " + fmt.Sprint(h.defaultEventType) + "\n"
 }
-
-type eventNumber int
-type _type string
-type track int
-type startTime int
-type endTime int
-type startPosition int
-type endPosition int
-type data []byte
-type continuation string
 
 type event struct {
 	eventNumber   int
@@ -64,7 +54,7 @@ type event struct {
 }
 
 func (e event) String() string {
-	return "      eventNumber: " + fmt.Sprint("%d\n", e.eventNumber) +
+	return "      eventNumber: " + fmt.Sprint(e.eventNumber) + "\n" +
 		"            _type: " + fmt.Sprint(e._type) + "\n" +
 		"            track: " + fmt.Sprint(e.track) + "\n" +
 		"       start time: " + fmt.Sprint(e.startTime) + "\n" +
@@ -80,7 +70,7 @@ type events []event
 func (es events) String() string {
 	s := "EVENTS:\n"
 	for _, e := range es {
-		s += e.String()
+		s += e.String() + "\n"
 	}
 	return s
 }
