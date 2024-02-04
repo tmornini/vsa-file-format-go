@@ -2,6 +2,7 @@ package vsafile
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"io"
 )
@@ -189,13 +190,66 @@ func headerFrom(reader io.Reader) (*header, error) {
 	return &h, nil
 }
 
-// func eventFrom(reader io.Reader) (*event, error) {}
+func newEventFrom(reader io.Reader, number int, kind string) (*event, error) {
+	e := event{number: number}
+
+	track, err := integerFrom(reader, 2)
+	if err != nil {
+		return nil, err
+	}
+	e.track = *track
+
+	startTime, err := integerFrom(reader, 4)
+	if err != nil {
+		return nil, err
+	}
+	e.startTime = *startTime
+
+	endTime, err := integerFrom(reader, 4)
+	if err != nil {
+		return nil, err
+	}
+	e.endTime = *endTime
+
+	startPosition, err := integerFrom(reader, 4)
+	if err != nil {
+		return nil, err
+	}
+	e.startPosition = *startPosition
+
+	endPosition, err := integerFrom(reader, 4)
+	if err != nil {
+		return nil, err
+	}
+	e.endPosition = *endPosition
+
+	data := &[]byte{}
+
+	switch kind {
+	case "CEventBarLinear":
+		data, err = bytesFrom(reader, 12)
+	case "CEventBar":
+		data, err = bytesFrom(reader, 16)
+	}
+	if err != nil {
+		return nil, err
+	}
+	e.data = *data
+
+	continuation, err := bytesFrom(reader, 2)
+	if err != nil {
+		return nil, err
+	}
+	e.continuation = hex.EncodeToString(*continuation)
+
+	return &e, nil
+}
 
 // func eventsFrom(reader io.Reader, h header) ([]event, error) {
 // 	events := make([]event, h.eventCount)
 
 // 	for i := 0; i < int(h.eventCount); i++ {
-// 		e, err := eventFrom(reader)
+// 		e, err := newEventFrom(reader)
 // 		if err != nil {
 // 			return nil, err
 // 		}
