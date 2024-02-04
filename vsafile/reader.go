@@ -43,7 +43,7 @@ func integerFrom(reader io.Reader, length int) (int, error) {
 		i = int(binary.LittleEndian.Uint16(bytesRead))
 	case 4:
 		i = int(binary.LittleEndian.Uint32(bytesRead))
-	case 5:
+	case 8:
 		i = int(binary.LittleEndian.Uint64(bytesRead))
 	}
 
