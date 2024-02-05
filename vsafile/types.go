@@ -28,6 +28,7 @@ type header struct {
 	eventCount       int
 	unknownTwo       []byte
 	defaultEventType string
+	otherEventType   string
 }
 
 func (h header) String() string {
@@ -38,7 +39,8 @@ func (h header) String() string {
 		"             email: " + fmt.Sprint(h.email) + "\n" +
 		"       event count: " + fmt.Sprintf("%d", h.eventCount) + "\n" +
 		"        unknownTwo: " + hex.EncodeToString(h.unknownTwo) + "\n" +
-		"  defaultEventType: " + fmt.Sprint(h.defaultEventType) + "\n"
+		"  defaultEventType: " + fmt.Sprint(h.defaultEventType) + "\n" +
+		"  defaultEventType: " + fmt.Sprint(h.otherEventType) + "\n"
 }
 
 type event struct {

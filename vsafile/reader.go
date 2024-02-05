@@ -188,6 +188,12 @@ func headerFrom(reader io.Reader) (*header, error) {
 	if err != nil {
 		return nil, err
 	}
+	switch h.defaultEventType {
+	case "CEventBarLinear":
+		h.otherEventType = "CEventBarPulse"
+	case "CEventBar":
+		h.otherEventType = "CEventBarLinear"
+	}
 
 	return h, nil
 }
@@ -261,30 +267,46 @@ func eventsFrom(reader io.Reader, h header) ([]event, error) {
 
 	currentEventType := h.defaultEventType
 
-	for i := 0; i < int(h.eventCount); i++ {
+	i := 0
+
+loop:
+	for {
 		e, err := newEventFrom(reader, i, currentEventType)
 		if err != nil {
 			return nil, err
 		}
 		events[i] = *e
 
+		i++
+
 		switch e.continuation {
-		case "0000":
-			fmt.Println("continuation: 0000 last event")
+		case "0100":
+			fmt.Println("continuation: 0100 last event")
+			break loop
 		case "0180":
 			fmt.Println("continuation: 0180 next event is default type")
-
 			currentEventType = h.defaultEventType
-		case "ffff":
-			fmt.Println("continuation: ffff: next event is new type!")
-
-			currentEventType, err = eventTypeFrom(reader)
-			if err != nil {
-				return nil, err
-			}
+		//
+		// The next two cases, 3087 and ffff, were documented by Nelson Bairos,
+		// but I'm not certain I understood them correctly. I'm leaving them
+		// commented out for now until I see an example file that uses them.
+		//
+		// case "3087":
+		// 	fmt.Println("continuation: 3087: next event is the other type")
+		// 	currentEventType = h.defaultEventType
+		// case "ffff":
+		// 	fmt.Println("continuation: ffff: new event type")
+		// 	currentEventType, err = stringFrom(reader, 1)
+		// 	if err != nil {
+		// 		return nil, err
+		// 	}
 		default:
 			fmt.Println("continuation:", e.continuation, "unknown")
 		}
+	}
+
+	if i != h.eventCount {
+		return nil, fmt.Errorf("expected %d event(s), got %d", h.eventCount, i)
 	}
 
 	return events, nil

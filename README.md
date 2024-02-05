@@ -16,9 +16,9 @@ HEADER
     SIZE(1) EMAIL(S)
     EVENTCOUNT(4)
     unknownTwo(4)
+    SIZE(2) DEFAULTEVENTTYPE(S)
 
 EVENTS
-    SIZE(2) DEFAULTEVENTTYPE(S)
         EVENT
             TRACK(2)
             STARTTIME(4)
@@ -26,16 +26,17 @@ EVENTS
             STARPOSITION(4)
             ENDPOSITION(4)
             unknownThree(1)
-            SIZE(1) KIND(S)            <--\
-                "CEventBarLinear"         |
-                    DATA(12)              | <-\
-                "CEventBarPulse"          |   | or
-                    DATA(16) Pulse        | <-|
-            NEXTEVENTTYPE(2)              |   |
-                FF FF = New Event Type >--/   |
-                01 80 = Default event type >--/
-                30 87 = Other event type ? perhaps observed but not understood ?
-                00 00 = Last event
+            SIZE(1) DEFAULTEVENTTYPE(S)
+                "CEventBarLinear"
+                    DATA(12)
+                "CEventBarPulse"
+                    DATA(16) Pulse
+            NEXTEVENTTYPE(2)
+                01 00 = Last event
+                01 80 = Default event type
+                30 87 = Other event type
+                FF FF = New Event Type
+                    followed by CEventBarLinear or CEventBarPulse - SIZE(2) DATA(S)
 
 AUDIO FILES
     COUNT(4)
