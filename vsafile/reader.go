@@ -292,14 +292,18 @@ loop:
 		// commented out for now until I see an example file that uses them.
 		//
 		// case "3087":
-		// 	fmt.Println("continuation: 3087: next event is the other type")
+		// 	fmt.Println("continuation: 3087: next event is not the default type")
 		// 	currentEventType = h.defaultEventType
-		// case "ffff":
-		// 	fmt.Println("continuation: ffff: new event type")
-		// 	currentEventType, err = stringFrom(reader, 1)
-		// 	if err != nil {
-		// 		return nil, err
-		// 	}
+		case "ffff":
+			_, err := bytesFrom(reader, 2) // discard two unknown bytes
+			if err != nil {
+				return nil, err
+			}
+			currentEventType, err = stringFrom(reader, 2)
+			if err != nil {
+				return nil, err
+			}
+			fmt.Println("continuation: ffff new event type:", currentEventType)
 		default:
 			fmt.Println("continuation:", e.continuation, "unknown")
 		}
