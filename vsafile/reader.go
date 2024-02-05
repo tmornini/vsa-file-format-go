@@ -245,7 +245,7 @@ func newEventFrom(reader io.Reader, eventNumber int, kind string) (*event, error
 	switch kind {
 	case "CEventBarLinear":
 		data, err = bytesFrom(reader, 12)
-	case "CEventBar":
+	case "CEventBarPulse":
 		data, err = bytesFrom(reader, 16)
 	}
 	if err != nil {
