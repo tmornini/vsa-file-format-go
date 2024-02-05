@@ -4,7 +4,7 @@ This package provides support for reading VSA files.
 
 ## History
 
-This code based upon documentation provided by Nelson (FIXME) of [LifeApe](https://lifeape.com)
+This code based upon documentation provided by Nelson Bairos of [LifeApe](https://lifeape.com)
 
 ## Format
 
