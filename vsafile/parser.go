@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-func bytesFrom(reader io.Reader, length int) ([]byte, error) {
+func bytesFrom(reader readerWithIndex, length int) ([]byte, error) {
 	bytes := make([]byte, length)
 
 	bytesRead, err := io.ReadFull(reader, bytes)
@@ -21,7 +21,7 @@ func bytesFrom(reader io.Reader, length int) ([]byte, error) {
 	return bytes, nil
 }
 
-func integerFrom(reader io.Reader, length int) (int, error) {
+func integerFrom(reader readerWithIndex, length int) (int, error) {
 	switch length {
 	case 1, 2, 4, 8:
 		// 👍🏻
@@ -50,7 +50,7 @@ func integerFrom(reader io.Reader, length int) (int, error) {
 	return i, nil
 }
 
-func stringFrom(reader io.Reader, lengthCount int) (string, error) {
+func stringFrom(reader readerWithIndex, lengthCount int) (string, error) {
 	length, err := integerFrom(reader, lengthCount)
 	if err != nil {
 		return "", err
@@ -76,7 +76,7 @@ func validateSignature(readSignature []byte) error {
 	return nil
 }
 
-func unknownOneFrom(reader io.Reader) ([]byte, error) {
+func unknownOneFrom(reader readerWithIndex) ([]byte, error) {
 	bytesRead, err := bytesFrom(reader, 12)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func unknownOneFrom(reader io.Reader) ([]byte, error) {
 	return bytesRead, nil
 }
 
-func levelFrom(reader io.Reader) (string, error) {
+func levelFrom(reader readerWithIndex) (string, error) {
 	l, err := stringFrom(reader, 1)
 	if err != nil {
 		return "", err
@@ -99,7 +99,7 @@ func levelFrom(reader io.Reader) (string, error) {
 	return l, nil
 }
 
-func optionsFrom(reader io.Reader) ([]byte, error) {
+func optionsFrom(reader readerWithIndex) ([]byte, error) {
 	o, err := stringFrom(reader, 1)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func optionsFrom(reader io.Reader) ([]byte, error) {
 	return []byte(o), nil
 }
 
-func emailFrom(reader io.Reader) (string, error) {
+func emailFrom(reader readerWithIndex) (string, error) {
 	e, err := stringFrom(reader, 1)
 
 	if err != nil {
@@ -118,7 +118,7 @@ func emailFrom(reader io.Reader) (string, error) {
 	return e, nil
 }
 
-func eventCountFrom(reader io.Reader) (int, error) {
+func eventCountFrom(reader readerWithIndex) (int, error) {
 	c, err := integerFrom(reader, 4)
 	if err != nil {
 		return 0, err
@@ -127,7 +127,7 @@ func eventCountFrom(reader io.Reader) (int, error) {
 	return c, nil
 }
 
-func unknownTwoFrom(reader io.Reader) ([]byte, error) {
+func unknownTwoFrom(reader readerWithIndex) ([]byte, error) {
 	bytesRead, err := bytesFrom(reader, 4)
 
 	if err != nil {
@@ -137,7 +137,7 @@ func unknownTwoFrom(reader io.Reader) ([]byte, error) {
 	return bytesRead, nil
 }
 
-func eventTypeFrom(reader io.Reader) (string, error) {
+func eventTypeFrom(reader readerWithIndex) (string, error) {
 	et, err := stringFrom(reader, 2)
 	if err != nil {
 		return "", err
@@ -145,7 +145,7 @@ func eventTypeFrom(reader io.Reader) (string, error) {
 	return et, nil
 }
 
-func headerFrom(reader io.Reader) (*header, error) {
+func headerFrom(reader readerWithIndex) (*header, error) {
 	h := &header{}
 
 	v, err := unknownOneFrom(reader)
@@ -198,7 +198,7 @@ func headerFrom(reader io.Reader) (*header, error) {
 	return h, nil
 }
 
-func newEventFrom(reader io.Reader, eventNumber int, kind string) (*event, error) {
+func newEventFrom(reader readerWithIndex, eventNumber int, kind string) (*event, error) {
 	e := event{
 		eventNumber: eventNumber,
 		_type:       kind,
@@ -262,7 +262,7 @@ func newEventFrom(reader io.Reader, eventNumber int, kind string) (*event, error
 	return &e, nil
 }
 
-func eventsFrom(reader io.Reader, h header) ([]event, error) {
+func eventsFrom(reader readerWithIndex, h header) ([]event, error) {
 	events := make([]event, h.eventCount)
 
 	currentEventType := h.defaultEventType
@@ -295,7 +295,7 @@ loop:
 		// 	fmt.Println("continuation: 3087: next event is not the default type")
 		// 	currentEventType = h.defaultEventType
 		case "ffff":
-			_, err := bytesFrom(reader, 2) // discard two unknown bytes
+			_, err := bytesFrom(reader, 2) // discard two unknownFour bytes
 			if err != nil {
 				return nil, err
 			}
@@ -305,7 +305,7 @@ loop:
 			}
 			fmt.Println("continuation: ffff new event type:", currentEventType)
 		default:
-			fmt.Println("continuation:", e.continuation, "unknown")
+			fmt.Println("continuation:", e.continuation, "unexpected,", "index: ", reader.Index())
 		}
 	}
 
@@ -318,15 +318,17 @@ loop:
 
 // NewFileFrom creates a new File from a ByteReader
 func NewFileFrom(reader io.Reader) (*File, error) {
+	cr := newCountingReader(reader)
+
 	f := File{}
 
-	h, err := headerFrom(reader)
+	h, err := headerFrom(cr)
 	if err != nil {
 		return nil, err
 	}
 	f.header = *h
 
-	es, err := eventsFrom(reader, f.header)
+	es, err := eventsFrom(cr, f.header)
 	if err != nil {
 		return nil, err
 	}

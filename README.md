@@ -36,7 +36,8 @@ EVENTS
                 01 80 = Default event type
                 30 87 = Other event type
                 FF FF = New Event Type
-                    followed by CEventBarLinear or CEventBarPulse - SIZE(2) DATA(S)
+                    unknownFour(2)
+                    SIZE(2) CURRENTEVENTTYPE(S)
 
 AUDIO FILES
     COUNT(4)
@@ -52,22 +53,22 @@ VIDEO FILES
         XOFFSET(4)
         YOFFSET(4)
 
-unknownFour(12)
+unknownFive(12)
 
 TRACK SETTINGS
     COUNT(4)
         SIZE(1) TEXT(S)
         ADDR(4)
         CNTR(1)
-        unknownFive(11)
+        unknownSix(11)
         +VAL(4)
         -VAL(4)
         NEUT(4)
         ENBL(1)
-        unknownSix(1)
-        unknownSeven(2)
+        unknownSeven(1)
+        unknownEight(2)
         SIZE(1) PORT(S)
-        unknownEight(12)
+        unknownNine(12)
 ```
 
 ## Unknown Fields
