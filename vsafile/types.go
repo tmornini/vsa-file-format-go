@@ -89,3 +89,15 @@ func (es events) String() string {
 	}
 	return s
 }
+
+type audioFile struct {
+}
+type audioFiles []audioFile
+
+type videoFile struct{}
+type videoFiles []videoFile
+
+type unknnownSix struct{}
+
+type trackSetting struct{}
+type trackSettings []trackSetting
