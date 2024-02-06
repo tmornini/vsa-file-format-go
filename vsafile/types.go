@@ -54,30 +54,29 @@ func (h header) String() string {
 }
 
 type event struct {
-	eventNumber         int
-	_type               string
-	track               int
-	startTime           int
-	endTime             int
-	startPosition       int
-	endPosition         int
-	lengthOfUnknownFour int
-	data                []byte
-	unknownFour         []byte
-	continuation        string
+	eventNumber   int
+	_type         string
+	track         int
+	startTime     int
+	endTime       int
+	startPosition int
+	endPosition   int
+	text          string
+	data          []byte
+	unknownFour   []byte
+	continuation  string
 }
 
 func (e event) String() string {
 	return "            eventNumber: " + fmt.Sprint(e.eventNumber) + "\n" +
-		"                  _type: " + fmt.Sprint(e._type) + "\n" +
+		"                  _type: " + e._type + "\n" +
 		"                  track: " + fmt.Sprint(e.track) + "\n" +
 		"             start time: " + fmt.Sprint(e.startTime) + "\n" +
 		"               end time: " + fmt.Sprint(e.endTime) + "\n" +
 		"          startPosition: " + fmt.Sprint(e.startPosition) + "\n" +
 		"            endPosition: " + fmt.Sprint(e.endPosition) + "\n" +
-		"    lengthOfUnknownFour: " + fmt.Sprint(e.lengthOfUnknownFour) + "\n" +
+		"                   text: " + e.text + "\n" +
 		"                   data: " + hex.EncodeToString(e.data) + "\n" +
-		"            unknownFour: " + hex.EncodeToString(e.unknownFour) + "\n" +
 		"           continuation: " + fmt.Sprint(e.continuation) + "\n"
 }
 

@@ -254,7 +254,7 @@ func newEventFrom(reader readerWithIndex, eventNumber int, currentEventType stri
 		return nil, err
 	}
 
-	lengthOfUnknownFour, err := integerFrom(reader, 1)
+	text, err := stringFrom(reader, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -270,28 +270,22 @@ func newEventFrom(reader readerWithIndex, eventNumber int, currentEventType stri
 		return nil, err
 	}
 
-	unknownFour, err := bytesFrom(reader, lengthOfUnknownFour)
-	if err != nil {
-		return nil, err
-	}
-
 	continuation, err := bytesFrom(reader, 2)
 	if err != nil {
 		return nil, err
 	}
 
 	return &event{
-		eventNumber:         eventNumber,
-		_type:               currentEventType,
-		track:               track,
-		startTime:           startTime,
-		endTime:             endTime,
-		startPosition:       startPosition,
-		endPosition:         endPosition,
-		lengthOfUnknownFour: lengthOfUnknownFour,
-		data:                data,
-		unknownFour:         unknownFour,
-		continuation:        hex.EncodeToString(continuation),
+		eventNumber:   eventNumber,
+		_type:         currentEventType,
+		track:         track,
+		startTime:     startTime,
+		endTime:       endTime,
+		startPosition: startPosition,
+		endPosition:   endPosition,
+		text:          text,
+		data:          data,
+		continuation:  hex.EncodeToString(continuation),
 	}, nil
 }
 
@@ -336,7 +330,7 @@ loop:
 			}
 			// fmt.Printf("event: %d continuation: ffff new current event type: %s\n", i, currentEventType)
 		default:
-			return nil, fmt.Errorf("event: %d continuation: %s is UNKNOWN", i, e.continuation)
+			return nil, fmt.Errorf("event: %d continuation: %s is unknown", i, e.continuation)
 		}
 		// fmt.Println()
 		i++
