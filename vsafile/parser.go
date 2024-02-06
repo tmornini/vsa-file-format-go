@@ -5,7 +5,35 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"time"
 )
+
+// NewFileFrom creates a new File from a ByteReader
+func NewFileFrom(reader io.Reader) (*File, error) {
+	f := File{
+		parseStartTime: time.Now(),
+	}
+
+	cr := newCountingReader(reader)
+
+	h, err := headerFrom(cr)
+	if err != nil {
+		return nil, err
+	}
+	f.header = *h
+
+	es, err := eventsFrom(cr, f.header)
+	if err != nil {
+		return nil, err
+	}
+	f.events = es
+
+	f.parseEndTime = time.Now()
+
+	return &f, nil
+}
+
+// private
 
 func bytesFrom(reader readerWithIndex, length int) ([]byte, error) {
 	bytes := make([]byte, length)
@@ -319,25 +347,4 @@ loop:
 	}
 
 	return events, nil
-}
-
-// NewFileFrom creates a new File from a ByteReader
-func NewFileFrom(reader io.Reader) (*File, error) {
-	cr := newCountingReader(reader)
-
-	f := File{}
-
-	h, err := headerFrom(cr)
-	if err != nil {
-		return nil, err
-	}
-	f.header = *h
-
-	es, err := eventsFrom(cr, f.header)
-	if err != nil {
-		return nil, err
-	}
-	f.events = es
-
-	return &f, nil
 }
