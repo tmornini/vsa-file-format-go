@@ -20,24 +20,28 @@ HEADER
 
 EVENTS
         EVENT
+            _type
+                "CEventBarLinear" or "CEventBarPulse"
             TRACK(2)
             STARTTIME(4)
             ENDTIME(4)
             STARPOSITION(4)
             ENDPOSITION(4)
-            unknownThree(1)
-            SIZE(1) DEFAULTEVENTTYPE(S)
+            lengthOfUnknown4(1)
+            case _Type
                 "CEventBarLinear"
                     DATA(12)
                 "CEventBarPulse"
                     DATA(16) Pulse
+            unknownFour(lengthOfUnknown4)
             NEXTEVENTTYPE(2)
-                01 00 = Last event
+                00 00 = documented by Nelson as "Last event"
+                01 00 = Final event
                 01 80 = Default event type
-                30 87 = Other event type
+                30 87 = Other event type (not Default event type?)
                 FF FF = New Event Type
-                    unknownFour(2)
-                    SIZE(2) CURRENTEVENTTYPE(S)
+                    unknownFive(2)
+                    SIZE(2) currentEventType(S)
 
 AUDIO FILES
     COUNT(4)
@@ -53,7 +57,7 @@ VIDEO FILES
         XOFFSET(4)
         YOFFSET(4)
 
-unknownFive(12)
+unknownSix(12)
 
 TRACK SETTINGS
     COUNT(4)

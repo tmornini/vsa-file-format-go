@@ -15,7 +15,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(file.String())
+	fmt.Print(file.String())
 
 	os.Exit(0)
 }

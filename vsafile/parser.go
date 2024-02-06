@@ -146,103 +146,93 @@ func eventTypeFrom(reader readerWithIndex) (string, error) {
 }
 
 func headerFrom(reader readerWithIndex) (*header, error) {
-	h := &header{}
-
-	v, err := unknownOneFrom(reader)
+	u1, err := unknownOneFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	h.unknownOne = v
 
-	l, err := levelFrom(reader)
+	lev, err := levelFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	h.level = l
 
-	os, err := optionsFrom(reader)
+	opts, err := optionsFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	h.options = os
 
-	e, err := emailFrom(reader)
+	email, err := emailFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	h.email = e
 
 	ec, err := eventCountFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	h.eventCount = ec
 
-	ot, err := unknownTwoFrom(reader)
+	u2, err := unknownTwoFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	h.unknownTwo = ot
 
-	h.defaultEventType, err = eventTypeFrom(reader)
+	oet := ""
+	det, err := eventTypeFrom(reader)
 	if err != nil {
 		return nil, err
 	}
-	switch h.defaultEventType {
+	switch det {
 	case "CEventBarLinear":
-		h.otherEventType = "CEventBarPulse"
+		oet = "CEventBarPulse"
 	case "CEventBar":
-		h.otherEventType = "CEventBarLinear"
+		oet = "CEventBarLinear"
 	}
 
-	return h, nil
+	return &header{
+		unknownOne:       u1,
+		level:            lev,
+		options:          opts,
+		email:            email,
+		eventCount:       ec,
+		unknownTwo:       u2,
+		defaultEventType: det,
+		otherEventType:   oet,
+	}, nil
 }
 
-func newEventFrom(reader readerWithIndex, eventNumber int, kind string) (*event, error) {
-	e := event{
-		eventNumber: eventNumber,
-		_type:       kind,
-	}
-
+func newEventFrom(reader readerWithIndex, eventNumber int, currentEventType string) (*event, error) {
 	track, err := integerFrom(reader, 2)
 	if err != nil {
 		return nil, err
 	}
-	e.track = track
 
 	startTime, err := integerFrom(reader, 4)
 	if err != nil {
 		return nil, err
 	}
-	e.startTime = startTime
 
 	endTime, err := integerFrom(reader, 4)
 	if err != nil {
 		return nil, err
 	}
-	e.endTime = endTime
 
 	startPosition, err := integerFrom(reader, 4)
 	if err != nil {
 		return nil, err
 	}
-	e.startPosition = startPosition
 
 	endPosition, err := integerFrom(reader, 4)
 	if err != nil {
 		return nil, err
 	}
-	e.endPosition = endPosition
 
-	unknownThree, err := bytesFrom(reader, 1)
+	lengthOfUnknownFour, err := integerFrom(reader, 1)
 	if err != nil {
 		return nil, err
 	}
-	e.unknownThree = unknownThree
 
 	data := []byte{}
-
-	switch kind {
+	switch currentEventType {
 	case "CEventBarLinear":
 		data, err = bytesFrom(reader, 12)
 	case "CEventBarPulse":
@@ -251,15 +241,30 @@ func newEventFrom(reader readerWithIndex, eventNumber int, kind string) (*event,
 	if err != nil {
 		return nil, err
 	}
-	e.data = data
+
+	unknownFour, err := bytesFrom(reader, lengthOfUnknownFour)
+	if err != nil {
+		return nil, err
+	}
 
 	continuation, err := bytesFrom(reader, 2)
 	if err != nil {
 		return nil, err
 	}
-	e.continuation = hex.EncodeToString(continuation)
 
-	return &e, nil
+	return &event{
+		eventNumber:         eventNumber,
+		_type:               currentEventType,
+		track:               track,
+		startTime:           startTime,
+		endTime:             endTime,
+		startPosition:       startPosition,
+		endPosition:         endPosition,
+		lengthOfUnknownFour: lengthOfUnknownFour,
+		data:                data,
+		unknownFour:         unknownFour,
+		continuation:        hex.EncodeToString(continuation),
+	}, nil
 }
 
 func eventsFrom(reader readerWithIndex, h header) ([]event, error) {
@@ -271,31 +276,29 @@ func eventsFrom(reader readerWithIndex, h header) ([]event, error) {
 
 loop:
 	for {
+		// fmt.Printf("event: %d begins at index %d\n", i, reader.Index())
+
 		e, err := newEventFrom(reader, i, currentEventType)
 		if err != nil {
 			return nil, err
 		}
 		events[i] = *e
 
-		i++
+		// fmt.Printf("event: %d type %s ends at index %d\n", i, e._type, reader.Index()-3)
+		// fmt.Printf("event: %d continuation %s ends at index %d\n", i, e.continuation, reader.Index()-1)
 
 		switch e.continuation {
 		case "0100":
-			fmt.Println("continuation: 0100 last event")
+			// fmt.Printf("event: %d continuation: 0100 final event\n", i)
 			break loop
 		case "0180":
-			fmt.Println("continuation: 0180 next event is default type")
+			// fmt.Printf("event %d continuation: 0180 next event is default type\n", i)
 			currentEventType = h.defaultEventType
-		//
-		// The next two cases, 3087 and ffff, were documented by Nelson Bairos,
-		// but I'm not certain I understood them correctly. I'm leaving them
-		// commented out for now until I see an example file that uses them.
-		//
-		// case "3087":
-		// 	fmt.Println("continuation: 3087: next event is not the default type")
-		// 	currentEventType = h.defaultEventType
+		case "3087":
+			// currentEventType = h.otherEventType // maybe?
+			return nil, fmt.Errorf("event: %d continuation: %s Nelson documented other event", i, e.continuation)
 		case "ffff":
-			_, err := bytesFrom(reader, 2) // discard two unknownFour bytes
+			_, err := bytesFrom(reader, 2) // discard two unknownFive bytes
 			if err != nil {
 				return nil, err
 			}
@@ -303,13 +306,15 @@ loop:
 			if err != nil {
 				return nil, err
 			}
-			fmt.Println("continuation: ffff new event type:", currentEventType)
+			// fmt.Printf("event: %d continuation: ffff new current event type: %s\n", i, currentEventType)
 		default:
-			fmt.Println("continuation:", e.continuation, "unexpected,", "index: ", reader.Index())
+			return nil, fmt.Errorf("event: %d continuation: %s is UNKNOWN", i, e.continuation)
 		}
+		// fmt.Println()
+		i++
 	}
 
-	if i != h.eventCount {
+	if i != h.eventCount-1 {
 		return nil, fmt.Errorf("expected %d event(s), got %d", h.eventCount, i)
 	}
 
