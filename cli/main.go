@@ -15,7 +15,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	duration, eventsPerSecond := file.EventsPerSecond()
+
 	fmt.Print(file.String())
+
+	fmt.Printf("Parsing duration: %s\n", duration)
+	fmt.Printf("Events per second: %.2f\n", eventsPerSecond)
 
 	os.Exit(0)
 }

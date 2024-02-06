@@ -4,12 +4,22 @@ package vsafile
 import (
 	"encoding/hex"
 	"fmt"
+	"time"
 )
 
 // File VSA file
 type File struct {
-	header header
-	events events
+	header         header
+	events         events
+	parseStartTime time.Time
+	parseEndTime   time.Time
+}
+
+// EventsPerSecond returns parsing duration and rate
+func (f File) EventsPerSecond() (time.Duration, float32) {
+	duration := f.parseEndTime.Sub(f.parseStartTime)
+	eventsPerSecond := float32(f.header.eventCount) / float32(duration.Seconds())
+	return duration, eventsPerSecond
 }
 
 func (f File) String() string {
