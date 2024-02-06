@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+go run cli/main.go < ~/Desktop/Skulltronix/vsa\ files/BadtotheBone2Pro_rev5.vsa            || exit 1
+go run cli/main.go < ~/Desktop/Skulltronix/vsa\ files/I\ Like\ NightmaresPro\ Rev5.vsa     || exit 1
+go run cli/main.go < ~/Desktop/Skulltronix/vsa\ files/Pumpkins\ Are\ Alive.rev5Pro.vsa     || exit 1
+go run cli/main.go < ~/Desktop/Skulltronix/vsa\ files/House\ of\ Pain\ SkullkinProRev5.vsa || exit 1
+go run cli/main.go < ~/Desktop/Skulltronix/vsa\ files/WitchesRev5Pro.vsa                   || exit 1
